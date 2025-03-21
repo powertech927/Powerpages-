@@ -1,0 +1,115 @@
+<div class="row sectionBlockLayout text-start">
+  <div class="container" style="padding: 0px;">
+      <div class="col-lg-12 columnBlockLayout">
+          <h2>Insert Data into Dataverse</h2>
+          <form id="dataForm">
+              <label for="name">Name:</label>
+              <input type="text" id="name" required><br><br>
+
+              <label for="email">Email:</label>
+              <input type="email" id="email" required><br><br>
+
+              <label for="address">Address:</label>
+              <input type="text" id="address" required><br><br>
+
+              <label for="date">Date:</label>
+              <input type="date" id="date" required><br><br>
+
+              <button type="submit">Submit</button>
+          </form>
+
+          <h2>Records from Dataverse</h2>
+          <table border="1">
+              <thead>
+                  <tr>
+                      <th>Name</th>
+                      <th>Email</th>
+                      <th>Address</th>
+                      <th>Date</th>
+                  </tr>
+              </thead>
+              <tbody id="recordsTable">
+                  <!-- Data will be populated here -->
+              </tbody>
+          </table>
+      </div>
+  </div>
+</div>
+
+<script>
+  const dataverseUrl = "https://org55250e00.crm8.dynamics.com/api/data/v9.0/cr11d_new_recordses"; // Replace with actual entity
+const accessToken = "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6IkpETmFfNGk0cjdGZ2lnTDNzSElsSTN4Vi1JVSIsImtpZCI6IkpETmFfNGk0cjdGZ2lnTDNzSElsSTN4Vi1JVSJ9.eyJhdWQiOiJodHRwczovL29yZzU1MjUwZTAwLmNybTguZHluYW1pY3MuY29tIiwiaXNzIjoiaHR0cHM6Ly9zdHMud2luZG93cy5uZXQvN2ZkMTQ2OGItYTExZi00N2RmLWFhOWItZDIyZmNmODYxZjBkLyIsImlhdCI6MTc0MjQ4MDUwMSwibmJmIjoxNzQyNDgwNTAxLCJleHAiOjE3NDI0ODQ0MDEsImFpbyI6ImsyUmdZRmpSdzJIclBuZitRYlBvTDAwSzY1MllBQT09IiwiYXBwaWQiOiIwNjY1NWViMS1hZDIyLTQ5ZTctOWMxZi1lN2QyNDk5ZjM5M2MiLCJhcHBpZGFjciI6IjEiLCJpZHAiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC83ZmQxNDY4Yi1hMTFmLTQ3ZGYtYWE5Yi1kMjJmY2Y4NjFmMGQvIiwiaWR0eXAiOiJhcHAiLCJvaWQiOiJlYjMxNjFiOC05YjEwLTQ1MmEtOGQyMi02ZjYyMjE1OWZkMGEiLCJyaCI6IjEuQVhBQWkwYlJmeC1oMzBlcW05SXZ6NFlmRFFjQUFBQUFBQUFBd0FBQUFBQUFBQURFQUFCd0FBLiIsInN1YiI6ImViMzE2MWI4LTliMTAtNDUyYS04ZDIyLTZmNjIyMTU5ZmQwYSIsInRlbmFudF9yZWdpb25fc2NvcGUiOiJBUyIsInRpZCI6IjdmZDE0NjhiLWExMWYtNDdkZi1hYTliLWQyMmZjZjg2MWYwZCIsInV0aSI6IjlReFI3STRRSDBhWk1WQ21xMnNMQUEiLCJ2ZXIiOiIxLjAiLCJ4bXNfaWRyZWwiOiIyMiA3In0.Q_6ohg9q_KmyXNWKjv_i7oYobnPBxTwu_BScA3mWhg1t-COEn9EPT4Li8P2bTnQdCTD3q3QMrjUmNjGThpin0FBuzVqXLrzDCdmIFXfuaN_WjUaclmhx5g-wRSu8cuvZ5HWQ5ZL078TP2h-yphQI63lw7ZplHhfD7XP26-nh8eov0vkIMfBpoZNTIGCkufSOaI5z-q7NjSNVPa1yma8rmNpDHu6OGLPXNJo_ba_uAf4PsTCs25u4pSyjtAK-JgXmNBpaoeDBZqtA4MoOr5j4C_k_Yupp4rzSyMvbrpQxP5IFPoCib5iGr977MKfMeaHjY2FNqfXpIKixGnRPUorqTA"; // Replace with actual OAuth token
+//org55250e00.crm8.dynamics.com
+// Fetch and display records
+async function fetchRecords() {
+ 
+    try {
+        const response = await fetch(dataverseUrl, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${accessToken}`,
+                "Accept": "application/json"
+            }
+        });
+
+        if (!response.ok) throw new Error(`Error: ${response.statusText}`);
+        
+        const data = await response.json();
+        const recordsTable = document.getElementById("recordsTable");
+        recordsTable.innerHTML = ""; // Clear table before adding new rows
+        
+        data.value.forEach(record => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>${record.cr11d_name}</td>
+                <td>${record.cr11d_email}</td>
+                <td>${record.cr11d_address}</td>
+                <td>${record.cr11d_date}</td>
+            `;
+            recordsTable.appendChild(row);
+        });
+    } catch (error) {
+        console.error("Error fetching records:", error);
+    }
+}
+
+document.getElementById("dataForm").addEventListener("submit", async function(event) {
+    event.preventDefault();
+    
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    const address = document.getElementById("address").value;
+    const date = document.getElementById("date").value;
+    
+    const formData = {
+        "cr11d_name": name,
+        "cr11d_email": email,
+        "cr11d_address": address,
+        "cr11d_date": date
+    };
+
+    try {
+        const response = await fetch(dataverseUrl, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${accessToken}`,
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            body: JSON.stringify(formData)
+        });
+
+        if (!response.ok) throw new Error(`Error: ${response.statusText}`);
+
+        alert("Data inserted successfully!");
+        document.getElementById("dataForm").reset();
+        fetchRecords(); // Refresh records table
+    } catch (error) {
+        console.error("Error inserting data:", error);
+    }
+});
+
+// Load records on page load
+fetchRecords();
+
+</script>
